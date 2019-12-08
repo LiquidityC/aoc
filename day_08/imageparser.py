@@ -12,7 +12,6 @@ def part1(data, width=25, height=6) :
             count = 0
             layers.append(layer)
             layer = []
-    print("Layer count:", len(layers))
 
     minZeros = 450000
     zeroLayer = []
@@ -22,7 +21,6 @@ def part1(data, width=25, height=6) :
             minZeros = zeroCount
             zeroLayer = layer
 
-    print("Min zeros:", minZeros)
     print("Part 1:", zeroLayer.count(1) * zeroLayer.count(2))
     return layers
 
@@ -35,16 +33,21 @@ def part2(layers):
 
     count = 0
     for p in result:
-        if p != 0:
-            print(p, end="")
+        if p == 0:
+            print("\033[30;40m%d\033[0m" % p, end="")
+        elif p == 1:
+            print("\033[37;47m%d\033[0m" % p, end="")
         else:
             print(" ", end="")
         count += 1
         if count == 25:
             count = 0
             print("")
+    print("")
 
 with open("input.txt") as fh:
     data = fh.readline().rstrip()
 layers = part1(data)
+print("")
+print("Message:")
 part2(layers)
