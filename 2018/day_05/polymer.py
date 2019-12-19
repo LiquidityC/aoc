@@ -1,19 +1,17 @@
+def reduce(polymer):
+    lowers = sorted(set(polymer.lower()))
+    uppers = [c.upper() for c in lowers]
+
+    prev = None
+    while prev != polymer:
+        prev = polymer
+        for p, q in zip(lowers, uppers):
+            polymer = polymer.replace(p + q, "")
+            polymer = polymer.replace(q + p, "")
+    return polymer
+
 
 with open("input.txt") as fh:
-    polymer = [c for c in fh.readline().rstrip()]
+    polymer = fh.readline().strip()
 
-while True:
-    length = len(polymer)
-    i = 0
-    while True:
-        a, b = polymer[i], polymer[i+1]
-        if a.upper() == b or b.upper() == a:
-            polymer[i:i+2] = []
-            #print("".join(map(str, polymer)))
-        i += 1
-        if i+1 >= len(polymer):
-            break
-    if length == len(polymer):
-        break
-
-print("Part 1:", len(polymer))
+print("Part 1:", len(reduce(polymer)))
