@@ -1,14 +1,5 @@
 use std::{str::FromStr, fs};
 
-pub fn get_input_lines() -> Vec<String> {
-    fs::read_to_string("input.txt")
-        .expect("Unable to read input.txt")
-        .trim()
-        .split("\n")
-        .map(|s| s.to_string())
-        .collect()
-}
-
 pub fn get_inputs<T>() -> Vec<T>
 where 
     T: FromStr,
@@ -42,7 +33,7 @@ mod tests {
     #[test]
     fn test_get_lines() {
         run_test(|| {
-            let lines = get_input_lines();
+            let lines: Vec<String> = get_inputs();
             for (index, line) in lines.iter().enumerate() {
                 assert_eq!(line, &format!("{}", index+1));
             }
