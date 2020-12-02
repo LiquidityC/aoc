@@ -11,14 +11,8 @@ struct PasswordRule {
 
 impl PasswordRule {
     fn is_valid(&self) -> bool {
-        let mut count = 0;
-        for c in self.password.chars() {
-            if c == self.character {
-                count += 1;
-            }
-        }
-
-        count >= self.min && count <= self.max
+        let count = self.password.chars().filter(|c| *c == self.character).count() as u32;
+        return count >= self.min && count <= self.max;
     }
 
     fn alternate_valid(&self) -> bool {
