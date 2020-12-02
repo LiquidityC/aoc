@@ -1,6 +1,6 @@
 use std::{error::Error, str::FromStr};
 
-use regex::Regex;
+use text_io::scan;
 
 struct PasswordRule {
     character: char,
@@ -18,7 +18,7 @@ impl PasswordRule {
             }
         }
 
-        return count >= self.min && count <= self.max;
+        count >= self.min && count <= self.max
     }
 
     fn alternate_valid(&self) -> bool {
@@ -33,14 +33,11 @@ impl FromStr for PasswordRule {
     type Err = Box<dyn Error>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let regex = Regex::new("^(\\d+)-(\\d+) (.): (.+)$")?;
-        let captures = regex.captures(s).unwrap();
-
-        //println!("{:?}", &captures);
-        let character = captures[3].chars().next().unwrap();
-        let min: u32 = captures[1].parse()?;
-        let max: u32 = captures[2].parse()?;
-        let password = captures[4].to_string();
+        let character: char;
+        let min: u32;
+        let max: u32;
+        let password: String;
+        scan!(s.bytes() => "{}-{} {}: {}", min, max, character, password);
 
         Ok(Self {
             character,
@@ -51,14 +48,14 @@ impl FromStr for PasswordRule {
     }
 }
 
-fn part1(input: &Vec<PasswordRule>) {
+fn part1(input: &[PasswordRule]) {
     println!(
         "Part 1: {}",
         input.iter().filter(|pwd| pwd.is_valid()).count()
     );
 }
 
-fn part2(input: &Vec<PasswordRule>) {
+fn part2(input: &[PasswordRule]) {
     println!(
         "Part 2: {}",
         input.iter().filter(|pwd| pwd.alternate_valid()).count()
