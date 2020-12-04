@@ -1,16 +1,24 @@
 use std::{str::FromStr, fs};
 
-pub fn get_inputs<T>() -> Vec<T>
-where 
+pub fn get_inputs_split<T>(sep: &str) -> Vec<T>
+where
     T: FromStr,
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
     fs::read_to_string("input.txt")
         .expect("Unable to read input.txt")
         .trim()
-        .split("\n")
+        .split(sep)
         .map(|s| s.parse::<T>().expect("Unable to convert value"))
         .collect()
+}
+
+pub fn get_inputs<T>() -> Vec<T>
+where 
+    T: FromStr,
+    <T as std::str::FromStr>::Err: std::fmt::Debug,
+{
+    get_inputs_split("\n")
 }
 
 pub fn get_input<T>() -> T
