@@ -10,7 +10,7 @@ fn get_rules(lines: &[String]) -> Rules {
         let mut inner = BTreeMap::new();
         if !contains_str.starts_with("no other") {
             for contains in contains_str.split(", ") {
-                let contained: Vec<&str> = contains.split(" ").collect();
+                let contained: Vec<&str> = contains.split(' ').collect();
                 let count: u32 = contained[0].parse().unwrap();
                 let color = format!("{} {}", contained[1], contained[2]);
                 inner.insert(color, count);
@@ -30,7 +30,7 @@ fn count_gold_bags(key: &str, rules: &Rules) -> bool {
         for bag in rule.keys() {
             result = count_gold_bags(bag, rules);
             if result {
-                break
+                break;
             }
         }
         result
@@ -56,10 +56,8 @@ fn main() {
 
     let mut sum = 0;
     for bag in rules.keys() {
-        if bag != "shiny gold" {
-            if count_gold_bags(bag, &rules) {
-                sum += 1;
-            }
+        if bag != "shiny gold" && count_gold_bags(bag, &rules) {
+            sum += 1;
         }
     }
     println!("Part 1: {}", sum);
