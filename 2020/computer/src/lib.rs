@@ -1,4 +1,8 @@
-use std::{collections::HashSet, str::FromStr};
+use std::{
+    collections::HashSet,
+    ops::{Deref, DerefMut},
+    str::FromStr,
+};
 
 #[derive(Debug, Clone)]
 pub struct Instruction {
@@ -24,7 +28,7 @@ pub enum ExecResult {
     Incomplete,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub struct Processor {
     accumulator: i32,
     iptr: i32,
@@ -41,19 +45,25 @@ impl Processor {
         let result: ExecResult;
 
         loop {
-            if executed.contains(&self.iptr) {
+            if !executed.insert(self.iptr) {
                 result = ExecResult::Cycle(self.accumulator);
                 break;
-            } else {
-                executed.insert(self.iptr);
             }
 
-            if self.iptr == instructions.len() as i32 {
-                result = ExecResult::Complete(self.accumulator);
-                break;
-            } else if self.iptr as usize > instructions.len() || self.iptr < 0 {
-                result = ExecResult::Invalid(self.accumulator);
-                break;
+            match &self.iptr {
+                x if *x == instructions.len() as i32 => {
+                    result = ExecResult::Complete(self.accumulator);
+                    break;
+                }
+                x if *x > instructions.len() as i32 => {
+                    result = ExecResult::Invalid(self.accumulator);
+                    break;
+                }
+                x if *x < 0 => {
+                    result = ExecResult::Invalid(self.accumulator);
+                    break;
+                }
+                _ => {}
             }
 
             self.iptr += match instructions.get(self.iptr as usize) {
@@ -74,5 +84,54 @@ impl Processor {
             };
         }
         result
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Computer {
+    pub instructions: Vec<Instruction>,
+    pub proc: Processor,
+}
+
+impl Deref for Computer {
+    type Target = Vec<Instruction>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.instructions
+    }
+}
+
+impl DerefMut for Computer {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.instructions
+    }
+}
+
+impl FromStr for Computer {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let instructions: Vec<Instruction> = s
+            .lines()
+            .map(|l| l.parse::<Instruction>().expect("Invalid instruction"))
+            .collect();
+        Ok(Computer::new(&instructions))
+    }
+}
+
+impl Computer {
+    pub fn new(instructions: &[Instruction]) -> Self {
+        Self {
+            instructions: instructions.to_vec(),
+            proc: Processor::default(),
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.proc.reset();
+    }
+
+    pub fn run(&mut self) -> ExecResult {
+        self.proc.execute(&self.instructions)
     }
 }
