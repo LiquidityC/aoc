@@ -1,9 +1,5 @@
 use std::{str::FromStr, fs};
 
-// Re-exports
-pub use regex::*;
-pub use text_io::*;
-
 pub fn get_inputs_split<T>(sep: &str) -> Vec<T>
 where
     T: FromStr,
