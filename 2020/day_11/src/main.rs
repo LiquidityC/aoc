@@ -1,192 +1,184 @@
-use std::collections::VecDeque;
+use std::collections::HashMap;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum Type {
-    Occupied,
-    Empty,
-    Floor,
+#[derive(Clone)]
+struct Seats {
+    m: Vec<Vec<char>>,
 }
 
-type Seats = VecDeque<Vec<Type>>;
+impl std::ops::Deref for Seats {
+    type Target = Vec<Vec<char>>;
 
-fn cycle(seats: &mut Seats) -> bool {
-    let dirs: Vec<(i32, i32)> = vec![
-        (1, 0),
-        (-1, 0),
-        (0, 1),
-        (0, -1),
-        (1, 1),
-        (-1, 1),
-        (1, -1),
-        (-1, -1),
-    ];
-    let mut empty_seats: Vec<(usize, usize)> = vec![];
-    let mut occupied_seats: Vec<(usize, usize)> = vec![];
-    for y in 1..seats.len() - 1 {
-        let row = &seats[y];
-        for x in 1..row.len() - 1 {
-            let seat = seats[y][x];
-            if seat != Type::Floor {
-                if seat == Type::Empty {
-                    let empty_count = dirs
-                        .iter()
-                        .map(|(dy, dx)| seats[(y as i32 + dy) as usize][(x as i32 + dx) as usize])
-                        .filter(|s| s == &Type::Empty || s == &Type::Floor)
-                        .count();
-                    if empty_count == 8 {
-                        occupied_seats.push((y, x));
-                    }
-                } else if seat == Type::Occupied {
-                    let occupied_count = dirs
-                        .iter()
-                        .map(|(dy, dx)| seats[(y as i32 + dy) as usize][(x as i32 + dx) as usize])
-                        .filter(|s| s == &Type::Occupied)
-                        .count();
-                    if occupied_count >= 4 {
-                        empty_seats.push((y, x));
-                    }
-                }
+    fn deref(&self) -> &Self::Target {
+        &self.m
+    }
+}
+
+impl std::ops::DerefMut for Seats {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.m
+    }
+}
+
+impl std::str::FromStr for Seats {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut rows = vec![];
+        for l in s.lines() {
+            rows.push(l.chars().collect());
+        }
+        Ok(Self { m: rows })
+    }
+}
+
+impl Seats {
+    fn simulate1(&mut self) {
+        loop {
+            if !self.cycle1() {
+                break;
             }
         }
     }
 
-    for (dy, dx) in occupied_seats.iter() {
-        seats[*dy][*dx] = Type::Occupied;
-    }
-
-    for (dy, dx) in empty_seats.iter() {
-        seats[*dy][*dx] = Type::Empty;
-    }
-
-    !occupied_seats.is_empty() || !empty_seats.is_empty()
-}
-
-fn look(seats: &Seats, origin: (usize, usize), dir: (i32, i32)) -> Type {
-    let mut result = Type::Floor;
-    let height = seats.len();
-    let width = seats[0].len();
-    let mut dy: i32 = origin.0 as i32;
-    let mut dx: i32 = origin.1 as i32;
-
-    loop {
-        dy += dir.0;
-        dx += dir.1;
-
-        if !(0..height).contains(&(dy as usize)) || !(0..width).contains(&(dx as usize)) {
-            break;
-        }
-
-        result = seats[dy as usize][dx as usize];
-        if result != Type::Floor {
-            break;
-        }
-    }
-
-    if result == Type::Floor {
-        result = Type::Empty
-    }
-    result
-}
-
-fn cycle2(seats: &mut Seats) -> bool {
-    let dirs: Vec<(i32, i32)> = vec![
-        (1, 0),
-        (-1, 0),
-        (0, 1),
-        (0, -1),
-        (1, 1),
-        (-1, 1),
-        (1, -1),
-        (-1, -1),
-    ];
-    let mut empty_seats: Vec<(usize, usize)> = vec![];
-    let mut occupied_seats: Vec<(usize, usize)> = vec![];
-    for y in 1..seats.len() - 1 {
-        let row = &seats[y];
-        for x in 1..row.len() - 1 {
-            let seat = seats[y][x];
-            if seat != Type::Floor {
-                if seat == Type::Empty {
-                    let empty_count = dirs
-                        .iter()
-                        .filter(|dir| look(&seats, (y, x), **dir) == Type::Empty)
-                        .count();
-                    if empty_count == 8 {
-                        occupied_seats.push((y, x));
-                    }
-                } else if seat == Type::Occupied {
-                    let occupied_count = dirs
-                        .iter()
-                        .filter(|dir| look(&seats, (y, x), **dir) == Type::Occupied)
-                        .count();
-                    if occupied_count >= 5 {
-                        empty_seats.push((y, x));
-                    }
-                }
+    fn simulate2(&mut self) {
+        loop {
+            if !self.cycle2() {
+                break;
             }
         }
     }
 
-    for (dy, dx) in occupied_seats.iter() {
-        seats[*dy][*dx] = Type::Occupied;
+    fn occupied_count(&self) -> usize {
+        self.m.iter().flatten().filter(|c| **c == '#').count()
     }
 
-    for (dy, dx) in empty_seats.iter() {
-        seats[*dy][*dx] = Type::Empty;
+    fn cycle1(&mut self) -> bool {
+        let mut changes: HashMap<(usize, usize), char> = HashMap::new();
+        let directions: Vec<(i32, i32)> = vec![
+            (1, 0),
+            (-1, 0),
+            (0, 1),
+            (0, -1),
+            (1, 1),
+            (1, -1),
+            (-1, 1),
+            (-1, -1),
+        ];
+        for (y, row) in self.m.iter().enumerate() {
+            for (x, c) in row.iter().enumerate() {
+                let x = x as i32;
+                let y = y as i32;
+                if *c == 'L' {
+                    let count = directions
+                        .iter()
+                        .map(|(dy, dx)| self.get(y + dy, x + dx))
+                        .filter(|s| *s != '#')
+                        .count();
+                    if count == 8 {
+                        changes.insert((y as usize, x as usize), '#');
+                    }
+                } else if *c == '#' {
+                    let count = directions
+                        .iter()
+                        .map(|(dy, dx)| self.get(y + dy, x + dx))
+                        .filter(|s| *s == '#')
+                        .count();
+                    if count >= 4 {
+                        changes.insert((y as usize, x as usize), 'L');
+                    }
+                }
+            }
+        }
+
+        for (pos, c) in changes.iter() {
+            self.m[pos.0][pos.1] = *c;
+        }
+
+        !changes.is_empty()
     }
 
-    !occupied_seats.is_empty() || !empty_seats.is_empty()
+    fn cycle2(&mut self) -> bool {
+        let mut changes: HashMap<(usize, usize), char> = HashMap::new();
+        let directions: Vec<(i32, i32)> = vec![
+            (1, 0),
+            (-1, 0),
+            (0, 1),
+            (0, -1),
+            (1, 1),
+            (1, -1),
+            (-1, 1),
+            (-1, -1),
+        ];
+        for (y, row) in self.m.iter().enumerate() {
+            for (x, c) in row.iter().enumerate() {
+                let x = x as i32;
+                let y = y as i32;
+                if *c == 'L' {
+                    let count = directions
+                        .iter()
+                        .map(|dir| self.scan((y, x), dir))
+                        .filter(|s| *s != '#')
+                        .count();
+                    if count == 8 {
+                        changes.insert((y as usize, x as usize), '#');
+                    }
+                } else if *c == '#' {
+                    let count = directions
+                        .iter()
+                        .map(|dir| self.scan((y, x), dir))
+                        .filter(|s| *s == '#')
+                        .count();
+                    if count >= 5 {
+                        changes.insert((y as usize, x as usize), 'L');
+                    }
+                }
+            }
+        }
+
+        for (pos, c) in changes.iter() {
+            self.m[pos.0][pos.1] = *c;
+        }
+
+        !changes.is_empty()
+    }
+
+    fn scan(&self, origin: (i32, i32), dir: &(i32, i32)) -> char {
+        let (mut y, mut x) = origin;
+        let (dy, dx) = dir;
+
+        let mut result: char;
+        loop {
+            y += dy;
+            x += dx;
+
+            result = self.get(y, x);
+            if result != '.' {
+                break;
+            }
+        }
+        if result == '_' {
+            result = 'L'
+        }
+        result
+    }
+
+    fn get(&self, y: i32, x: i32) -> char {
+        let h = self.m.len() as i32;
+        let w = self.m[0].len() as i32;
+        if (x < 0 || x >= w) || (y < 0 || y >= h) {
+            '_'
+        } else {
+            self.m[y as usize][x as usize]
+        }
+    }
 }
 
 fn main() {
-    let inputs: Vec<String> = input_reader::get_inputs();
+    let mut seats: Seats = input_reader::get_input();
+    seats.simulate1();
+    println!("Part 1: {}", seats.occupied_count());
 
-    let mut seats: Seats = VecDeque::new();
-    for l in inputs {
-        let mut row = vec![];
-        row.push(Type::Floor);
-        for c in l.chars() {
-            row.push(match c {
-                'L' => Type::Empty,
-                '#' => Type::Occupied,
-                _ => Type::Floor,
-            });
-        }
-        row.push(Type::Floor);
-        seats.push_back(row);
-    }
-
-    let row_len = seats[0].len();
-    seats.push_back(vec![Type::Floor; row_len]);
-    seats.push_front(vec![Type::Floor; row_len]);
-
-    let mut seats2 = seats.clone();
-
-    loop {
-        if !cycle(&mut seats) {
-            break;
-        }
-    }
-    println!(
-        "Part 1: {}",
-        seats
-            .iter()
-            .flatten()
-            .filter(|s| *s == &Type::Occupied)
-            .count()
-    );
-
-    loop {
-        if !cycle2(&mut seats2) {
-            break;
-        }
-    }
-    println!(
-        "Part 2: {}",
-        seats2
-            .iter()
-            .flatten()
-            .filter(|s| *s == &Type::Occupied)
-            .count()
-    );
+    let mut seats: Seats = input_reader::get_input();
+    seats.simulate2();
+    println!("Part 2: {}", seats.occupied_count());
 }
