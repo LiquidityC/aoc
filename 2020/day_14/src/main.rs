@@ -1,13 +1,5 @@
 use std::collections::BTreeMap;
 
-fn bits_to_num(bits: &str) -> u64 {
-    bits.chars()
-        .rev()
-        .enumerate()
-        .map(|(i, c)| if c == '1' { 2u64.pow(i as u32) } else { 0 })
-        .sum()
-}
-
 fn merge(mask: &str, value: &u64) -> u64 {
     let val_str = format!("{:0>36b}", value);
     let merge_str: String = mask
@@ -15,7 +7,7 @@ fn merge(mask: &str, value: &u64) -> u64 {
         .zip(val_str.chars())
         .map(|(a, b)| if a == 'X' { b } else { a })
         .collect();
-    bits_to_num(&merge_str)
+    u64::from_str_radix(&merge_str, 2).unwrap()
 }
 
 fn float_merge(mask: &str, value: &u64) -> Vec<u64> {
@@ -45,7 +37,10 @@ fn float_merge(mask: &str, value: &u64) -> Vec<u64> {
                 }
                 results
             });
-    results.iter().map(|s| bits_to_num(s)).collect()
+    results
+        .iter()
+        .map(|s| u64::from_str_radix(s, 2).unwrap())
+        .collect()
 }
 
 fn main() {
