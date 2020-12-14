@@ -5,8 +5,15 @@ name = "day_14"
 version = "0.1.0"
 dependencies = [
  "input_reader",
+ "text_io",
 ]
 
 [[package]]
 name = "input_reader"
 version = "0.1.0"
+
+[[package]]
+name = "text_io"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6cb170b4f47dc48835fbc56259c12d8963e542b05a24be2e3a1f5a6c320fd2d4"
