@@ -22,22 +22,17 @@ fn solve(p: &str, index: &mut usize) -> i64 {
         let c = p.chars().nth(*index).unwrap();
         if c == ')' {
             break;
-        }
-        if c == '(' {
+        } else if c == '(' {
             *index += 1;
             sum = op.calc(sum, solve(p, index));
-            *index += 1;
-            continue;
-        }
-        if c.is_digit(10) {
+        } else if c.is_digit(10) {
             sum = op.calc(sum, c.to_digit(10).unwrap() as i64);
-            *index += 1;
-            continue;
-        }
-        match c {
-            '+' => op = Op::Add,
-            '*' => op = Op::Mul,
-            _ => unreachable!("This wasn't good"),
+        } else {
+            match c {
+                '+' => op = Op::Add,
+                '*' => op = Op::Mul,
+                _ => unreachable!("This wasn't good"),
+            }
         }
         *index += 1;
     }
@@ -52,8 +47,7 @@ fn solve2(p: &str, index: &mut usize) -> i64 {
         let c = p.chars().nth(*index).unwrap();
         if c == ')' {
             break;
-        }
-        if c == '(' {
+        } else if c == '(' {
             *index += 1;
             match op {
                 Op::Add => sum = op.calc(sum, solve2(p, index)),
@@ -63,10 +57,7 @@ fn solve2(p: &str, index: &mut usize) -> i64 {
                 }
                 Op::None => sum = solve2(p, index),
             }
-            *index += 1;
-            continue;
-        }
-        if c.is_digit(10) {
+        } else if c.is_digit(10) {
             let num = c.to_digit(10).unwrap() as i64;
             match op {
                 Op::Mul => {
@@ -76,13 +67,12 @@ fn solve2(p: &str, index: &mut usize) -> i64 {
                 Op::Add => sum = op.calc(sum, num),
                 Op::None => sum = num,
             }
-            *index += 1;
-            continue;
-        }
-        match c {
-            '+' => op = Op::Add,
-            '*' => op = Op::Mul,
-            _ => unreachable!("This wasn't good"),
+        } else {
+            match c {
+                '+' => op = Op::Add,
+                '*' => op = Op::Mul,
+                _ => unreachable!("This wasn't good"),
+            }
         }
         *index += 1;
     }
