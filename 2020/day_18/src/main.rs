@@ -46,7 +46,7 @@ fn solve(p: &str, index: &mut usize) -> i64 {
     sum
 }
 
-fn solve2(p: &str, index: &mut usize) -> Vec<i64> {
+fn solve2(p: &str, index: &mut usize) -> i64 {
     let mut op = Op::None;
     let mut products: Vec<i64> = vec![];
     let mut sum: i64 = 0;
@@ -58,12 +58,12 @@ fn solve2(p: &str, index: &mut usize) -> Vec<i64> {
         if c == '(' {
             *index += 1;
             match op {
-                Op::Add => sum = calc(op, sum, solve2(p, index).iter().product()),
+                Op::Add => sum = calc(op, sum, solve2(p, index)),
                 Op::Mul => {
                     products.push(sum);
-                    sum = solve2(p, index).iter().product();
+                    sum = solve2(p, index);
                 }
-                Op::None => sum = solve2(p, index).iter().product(),
+                Op::None => sum = solve2(p, index),
             }
             *index += 1;
             continue;
@@ -89,7 +89,7 @@ fn solve2(p: &str, index: &mut usize) -> Vec<i64> {
         *index += 1;
     }
     products.push(sum);
-    products
+    products.iter().product()
 }
 
 fn main() {
@@ -102,9 +102,6 @@ fn main() {
     );
     println!(
         "Part 2: {}",
-        lines
-            .iter()
-            .map(|l| solve2(&l, &mut 0).iter().product::<i64>())
-            .sum::<i64>()
+        lines.iter().map(|l| solve2(&l, &mut 0)).sum::<i64>()
     );
 }
