@@ -5,14 +5,12 @@ enum Op {
     None,
 }
 
-fn calc(op: Op, a: i64, b: i64) -> i64 {
-    if a == 0 {
-        b
-    } else {
-        match op {
+impl Op {
+    fn calc(&self, a: i64, b: i64) -> i64 {
+        match self {
             Op::Add => a + b,
             Op::Mul => a * b,
-            _ => panic!("Bad value"),
+            _ => b,
         }
     }
 }
@@ -27,12 +25,12 @@ fn solve(p: &str, index: &mut usize) -> i64 {
         }
         if c == '(' {
             *index += 1;
-            sum = calc(op, sum, solve(p, index));
+            sum = op.calc(sum, solve(p, index));
             *index += 1;
             continue;
         }
         if c.is_digit(10) {
-            sum = calc(op, sum, c.to_digit(10).unwrap() as i64);
+            sum = op.calc(sum, c.to_digit(10).unwrap() as i64);
             *index += 1;
             continue;
         }
@@ -58,7 +56,7 @@ fn solve2(p: &str, index: &mut usize) -> i64 {
         if c == '(' {
             *index += 1;
             match op {
-                Op::Add => sum = calc(op, sum, solve2(p, index)),
+                Op::Add => sum = op.calc(sum, solve2(p, index)),
                 Op::Mul => {
                     products.push(sum);
                     sum = solve2(p, index);
@@ -75,7 +73,7 @@ fn solve2(p: &str, index: &mut usize) -> i64 {
                     products.push(sum);
                     sum = num;
                 }
-                Op::Add => sum = calc(op, sum, num),
+                Op::Add => sum = op.calc(sum, num),
                 Op::None => sum = num,
             }
             *index += 1;
