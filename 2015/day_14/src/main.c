@@ -115,6 +115,7 @@ int main(int argc, char** argv)
 
     int deer_count = count_lines(fp);
     Deer *deer = read_deer(fp, deer_count);
+    fclose(fp);
 
     part1(deer, deer_count, 2503);
     part2(deer, deer_count, 2503);
