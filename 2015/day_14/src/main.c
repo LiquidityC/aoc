@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <libinput.h>
 
 const char *input_file = "input.txt";
 
@@ -19,20 +20,6 @@ typedef struct {
     int moving;
     int score;
 } Deer;
-
-int count_lines(FILE *fp)
-{
-    int count = 0;
-    int ch = 0;
-
-    while ((ch = fgetc(fp)) != EOF) {
-        if (ch == '\n') {
-            count += 1;
-        }
-    }
-    rewind(fp);
-    return count;
-}
 
 Deer* read_deer(FILE *fp, int count)
 {
