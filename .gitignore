@@ -2,3 +2,5 @@ tags
 input.txt
 __pycache__
 target
+.build/
+.cache/
