@@ -21,21 +21,18 @@ typedef struct {
     int score;
 } Deer;
 
-Deer* read_deer(FILE *fp, int count)
+Deer* read_deer(Lines *lines)
 {
-    Deer *deer = (Deer*) malloc(sizeof(Deer)*count);
-    if (feof(fp)) {
-        fprintf(stderr, "File pointer is exhausted");
-    }
+    Deer *deer = (Deer*) malloc(sizeof(Deer)*lines->size);
 
     int index = 0;
-    while (index < count) {
+    while (index < lines->size) {
         Deer *tmp = &deer[index];
         tmp->distance = 0;
         tmp->resting = 0;
         tmp->moving = 0;
         tmp->score = 0;
-        fscanf(fp,
+        sscanf(lines->lines[index],
                "%s can fly %d km/s for %d seconds, but then must rest for %d %*s",
               tmp->name,
                &tmp->speed,
@@ -113,9 +110,12 @@ int main(int argc, char** argv)
         fprintf(stderr, "Failed to open file: %s", input_file);
     }
 
-    int deer_count = count_lines(fp);
-    Deer *deer = read_deer(fp, deer_count);
+    Lines* lines = read_lines(fp);
+    int deer_count = lines->size;
     fclose(fp);
+
+    Deer *deer = read_deer(lines);
+    lines_free(lines);
 
     part1(deer, deer_count, 2503);
     part2(deer, deer_count, 2503);
