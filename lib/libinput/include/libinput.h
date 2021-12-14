@@ -10,7 +10,7 @@ typedef struct Lines {
     int size;
 } Lines;
 
+Lines* lines_read(FILE *fp);
 void lines_free(Lines *lines);
 
 FileStats* file_stats(FILE *fp);
-Lines* read_lines(FILE *fp);

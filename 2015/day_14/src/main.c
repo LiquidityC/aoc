@@ -110,7 +110,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "Failed to open file: %s", input_file);
     }
 
-    Lines* lines = read_lines(fp);
+    Lines* lines = lines_read(fp);
     int deer_count = lines->size;
     fclose(fp);
 
