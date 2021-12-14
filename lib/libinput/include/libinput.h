@@ -1,3 +1,6 @@
+#ifndef __LIBINPUT__
+#define __LIBINPUT__
+
 #include <stdio.h>
 
 typedef struct FileStats {
@@ -14,3 +17,5 @@ Lines* lines_read(FILE *fp);
 void lines_free(Lines *lines);
 
 FileStats* file_stats(FILE *fp);
+
+#endif // __LIBINPUT__
