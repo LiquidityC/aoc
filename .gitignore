@@ -4,3 +4,4 @@ __pycache__
 target
 .build/
 .cache/
+compile_commands.json
