@@ -19,17 +19,22 @@ int main()
 	int *min_container_counts = calloc(20, sizeof(int));
 
 	int combo_count = 0;
-	int total, t, container_count;
+	int total, container_count;
+
+	/* Generate all subsets:
+	 * Iterate a bitmask from 0 to size^2 
+	 * (one bit larger then size) */
 	for (int i = 0; i < (1 << ccount); ++i) {
 		total = 0;
-		t = i;
 		container_count = 0;
 		for (int j = 0; j < ccount; ++j) {
-			if ((t % 2) == 1) {
+
+			/* Shift out the current bit and check if set.
+			 * Include values based on the bitmask */
+			if (((i>>j) & 1) == 1) {
 				total += containers[j];
 				container_count += 1;
 			}
-			t /= 2;
 		}
 		if (total == 150) {
 			combo_count += 1;
