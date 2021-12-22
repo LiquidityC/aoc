@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import defaultdict
 
 def volume(rx, ry, rz):
     return (rx[1]-rx[0]+1) * (ry[1]-ry[0]+1) * (rz[1]-rz[0]+1)
@@ -17,17 +17,16 @@ def intersects(c1, c2):
         return ((xs, xe), (ys, ye), (zs, ze))
 
 def reboot(ops):
-    reactor = Counter()
+    reactor = defaultdict(int)
     for state, new in ops:
-        update = Counter()
-        for old, sgn in reactor.items():
+        for old, sgn in reactor.copy().items():
             intersection = intersects(old, new)
             if intersection:
-                update[intersection] -= sgn
+                reactor[intersection] -= sgn
 
         if state > 0:
-            update[new] += 1
-        reactor.update(update)
+            reactor[new] = 1
+
     return sum([volume(*c)*v for c, v in reactor.items()])
 
 if __name__ == "__main__":
