@@ -38,6 +38,7 @@ def part1(s1, s2):
     print("Part 1: %d" % (min_score * rolls))
 
 rolls = Counter([sum(t) for t in product([1, 2, 3], repeat=3)])
+print(rolls.items())
 @lru_cache(maxsize=None)
 def play(starting_positions, starting_scores, player):
 
