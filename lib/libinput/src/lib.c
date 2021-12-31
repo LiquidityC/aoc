@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "libinput.h"
 
 static FileStats* stats_new()

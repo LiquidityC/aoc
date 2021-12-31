@@ -6,6 +6,7 @@ static Lines* lines_new(int line_count, int line_length)
     Lines *lines = malloc(sizeof(Lines));
     lines->lines = malloc(line_count * sizeof(char*));
     lines->size = line_count;
+    lines->length = line_length;
     for (int i = 0; i < line_count; ++i) {
         lines->lines[i] = malloc(sizeof(char) * line_length+1);
     }

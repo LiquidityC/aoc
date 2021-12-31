@@ -11,6 +11,7 @@ typedef struct FileStats {
 typedef struct Lines {
     char **lines;
     int size;
+    int length;
 } Lines;
 
 Lines* lines_read(FILE *fp);
