@@ -17,7 +17,7 @@ class Beacon():
     def __init__(self, pos, distances=None):
         self.pos = pos
         if not distances:
-            self.distances = defaultdict(list)
+            self.distances = {}
         else:
             self.distances = distances
 
