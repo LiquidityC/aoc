@@ -5,3 +5,4 @@ target
 .build/
 .cache/
 compile_commands.json
+.ccls_cache/
