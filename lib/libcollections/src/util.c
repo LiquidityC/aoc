@@ -1,5 +1,6 @@
-#include "util.h"
 #include <stdio.h>
+#include <string.h>
+#include "util.h"
 
 void* ec_malloc(size_t size)
 {
@@ -19,4 +20,14 @@ void* ec_calloc(unsigned int count, size_t size)
         exit(-1);
     }
     return m;
+}
+
+char* ec_strdup(const char *str)
+{
+    char *new = strdup(str);
+    if (new == NULL) {
+        fprintf(stderr, "[!!] strdup(%s) failed\n", str);
+        exit(-1);
+    }
+    return new;
 }
