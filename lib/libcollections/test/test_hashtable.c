@@ -33,7 +33,7 @@ static void get_test(void)
     assert(42 == *result);
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     capcity_test();
     get_test();

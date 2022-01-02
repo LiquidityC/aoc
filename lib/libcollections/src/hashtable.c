@@ -111,6 +111,38 @@ const char* ht_set(HashTable* ht, const char *key, void *value)
     return ht_set_entry(ht->entries, ht->capacity, key, value, &ht->length);
 }
 
+void* ht_remove(HashTable *ht, const char *key)
+{
+    uint64_t hash = hash_key(key);
+    size_t index = (size_t)(hash & (uint64_t)(ht->capacity - 1));
+
+    while (ht->entries[index].key != NULL) {
+        if (strcmp(key, ht->entries[index].key) == 0) {
+            void *value = ht->entries[index].value;
+            free(ht->entries[index].key);
+            ht->entries[index].value = NULL;
+            ht->entries[index].key = NULL;
+            ht->length--;
+            return value;
+        }
+
+        index = (index + 1) % ht->capacity;
+    }
+    return NULL;
+}
+
+void ht_clear(HashTable *ht)
+{
+    for (size_t i = 0; i < ht->capacity; ++i) {
+        if (ht->entries[i].key != NULL) {
+            free((void*) ht->entries[i].key);
+            ht->entries[i].key = NULL;
+            ht->entries[i].value = NULL;
+        }
+    }
+    ht->length = 0;
+}
+
 size_t ht_length(HashTable *ht)
 {
     return ht->length;

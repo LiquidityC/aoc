@@ -47,8 +47,10 @@ typedef struct HashTableIter {
 
 HashTable* ht_create(void);
 void* ht_get(HashTable *table, const char *key);
-const char* ht_set(HashTable *table, const char *key, void *value);
 void ht_destroy(HashTable *table);
+const char* ht_set(HashTable *table, const char *key, void *value);
+void* ht_remove(HashTable *table, const char *key);
+void ht_clear(HashTable *table);
 size_t ht_length(HashTable *table);
 HashTableIter ht_iterator(HashTable *table);
 bool ht_next(HashTableIter *iter);

@@ -52,7 +52,7 @@ static void confirm_content()
     linkedlist_free(list);
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     simple_test();
     len_test();
