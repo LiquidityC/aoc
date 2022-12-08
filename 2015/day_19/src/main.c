@@ -112,7 +112,7 @@ static int repl_cmp(const void *a, const void *b)
     return strlen(r2->value)-strlen(r1->value);
 }
 
-int main()
+int main(void)
 {
     FILE *fp = fopen("input.txt", "r");
     Lines *lines = lines_read(fp);

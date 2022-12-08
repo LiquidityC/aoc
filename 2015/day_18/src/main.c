@@ -29,9 +29,8 @@ static void step(Matrix *matrix, bool locked_corners)
     matrix_free(new_m);
 }
 
-int main(int argc, char** argv)
+int main(void)
 {
-
     FILE* fp = fopen("input.txt", "r");
     Lines* lines = lines_read(fp);
     Matrix* matrix = matrix_new(lines->length, lines->size);

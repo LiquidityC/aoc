@@ -47,7 +47,7 @@ static uint64_t alt_calc(uint64_t number)
     return sum;
 }
 
-int main()
+int main(void)
 {
     assert(calc(1) == 10);
     assert(calc(2) == 30);
