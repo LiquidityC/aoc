@@ -48,6 +48,26 @@ int matrix_sum(Matrix* m)
     return sum;
 }
 
+int matrix_neighbors4(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
+{
+    size_t xmin = max(0, x-1);
+    size_t xmax = min(matrix->width-1, x+1);
+    size_t ymin = max(0, y-1);
+    size_t ymax = min(matrix->height-1, y+1);
+
+    size_t index = 0;
+    if (xmax != x)
+	    buf[index++] = matrix->data[xmax][y];
+    if (xmin != x)
+	    buf[index++] = matrix->data[xmin][y];
+    if (ymin != y)
+	    buf[index++] = matrix->data[x][ymin];
+    if (ymax != y)
+	    buf[index++] = matrix->data[x][ymax];
+
+    return index;
+}
+
 int matrix_neighbors8(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
 {
     size_t xmin = max(0, x-1);

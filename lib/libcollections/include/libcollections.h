@@ -2,6 +2,7 @@
 #define __LIBCOLLECTIONS__
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 typedef struct LinkedList {
@@ -16,13 +17,14 @@ void linkedlist_free(LinkedList *head);
 
 typedef struct Matrix {
     int **data;
-    unsigned int width;
-    unsigned int height;
+    size_t width;
+    size_t height;
 } Matrix;
 
 Matrix* matrix_new(unsigned int width, unsigned int height);
 void matrix_copy(Matrix* src, Matrix* dest);
 int matrix_sum(Matrix* m);
+int matrix_neighbors4(Matrix *matrix, int *buf, unsigned int x, unsigned int y);
 int matrix_neighbors8(Matrix *matrix, int *buf, unsigned int x, unsigned int y);
 void matrix_print(Matrix* m);
 void matrix_free(Matrix* matrix);
