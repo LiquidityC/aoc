@@ -16,7 +16,7 @@ void array_add(Array *a, int64_t v)
 	a->array[a->used++] = v;
 	if (a->used == a->size) {
 		a->size *= 2;
-		a->array = realloc(a->array, a->size * sizeof(int64_t));
+		a->array = ec_realloc(a->array, a->size * sizeof(int64_t));
 	}
 }
 
@@ -36,7 +36,7 @@ void array_insert(Array *a, size_t index, int64_t v)
 		a->used++;
 		if (a->used == a->size) {
 			a->size *= 2;
-			a->array = realloc(a->array, a->size * sizeof(int64_t));
+			a->array = ec_realloc(a->array, a->size * sizeof(int64_t));
 		}
 		for (size_t i = a->used-1; i > index; --i) {
 			a->array[i] = a->array[i-1];

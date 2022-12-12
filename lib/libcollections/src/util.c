@@ -31,3 +31,13 @@ char* ec_strdup(const char *str)
     }
     return new;
 }
+
+void* ec_realloc(void *ptr, size_t nsize)
+{
+	void *nptr = realloc(ptr, nsize);
+	if (nptr == NULL) {
+		fprintf(stderr, "[!!] realloc(%p, %lu) failed\n", ptr, nsize);
+		exit(-1);
+	}
+	return nptr;
+}
