@@ -37,6 +37,13 @@ Lines* lines_read(FILE *fp)
     return lines;
 }
 
+void lines_print(Lines *lines)
+{
+	for (size_t i = 0; i < lines->size; ++i) {
+		printf("%s\n", lines->lines[i]);
+	}
+}
+
 void lines_free(Lines *lines)
 {
     for (int i = 0; i < lines->size; i++) {

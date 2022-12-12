@@ -5,25 +5,25 @@
 #include <stdio.h>
 #include <assert.h>
 
-static int max(int a, int b)
+static int64_t max(int64_t a, int64_t b)
 {
     return a > b ? a : b;
 }
 
-static int min(int a, int b)
+static int64_t min(int64_t a, int64_t b)
 {
     return a < b ? a : b;
 }
 
-Matrix* matrix_new(unsigned int width,
-                   unsigned int height)
+Matrix* matrix_new(size_t width,
+                   size_t height)
 {
     Matrix *m = ec_malloc(sizeof(Matrix));
     m->width = width;
     m->height = height;
-    m->data = ec_malloc(sizeof(int*) * height);
+    m->data = ec_malloc(sizeof(int64_t*) * height);
     for (size_t i = 0; i < height; ++i) {
-        m->data[i] = ec_calloc(width, sizeof(int));
+        m->data[i] = ec_calloc(width, sizeof(int64_t));
     }
     return m;
 }
@@ -37,9 +37,9 @@ void matrix_copy(Matrix* src, Matrix* dest) {
     }
 }
 
-int matrix_sum(Matrix* m)
+int64_t matrix_sum(Matrix* m)
 {
-    int sum = 0;
+    int64_t sum = 0;
     for (size_t i = 0; i < m->height; ++i) {
         for (size_t j = 0; j < m->width; ++j) {
             sum += m->data[i][j];
@@ -48,7 +48,7 @@ int matrix_sum(Matrix* m)
     return sum;
 }
 
-int matrix_neighbors4(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
+int64_t matrix_neighbors4(Matrix* matrix, int64_t *buf, size_t x, size_t y)
 {
     size_t xmin = max(0, x-1);
     size_t xmax = min(matrix->width-1, x+1);
@@ -68,14 +68,14 @@ int matrix_neighbors4(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
     return index;
 }
 
-int matrix_neighbors8(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
+int64_t matrix_neighbors8(Matrix* matrix, int64_t *buf, size_t x, size_t y)
 {
     size_t xmin = max(0, x-1);
     size_t xmax = min(matrix->width-1, x+1);
     size_t ymin = max(0, y-1);
     size_t ymax = min(matrix->height-1, y+1);
 
-    int index = 0;
+    int64_t index = 0;
     for (size_t i = ymin; i <= ymax; ++i) {
         for (size_t j = xmin; j <= xmax; ++j) {
             if (i == y && j == x)
@@ -86,11 +86,16 @@ int matrix_neighbors8(Matrix* matrix, int *buf, uint32_t x, uint32_t y)
     return index;
 }
 
+bool matrix_contains_point(Matrix *matrix, int64_t x, int64_t y)
+{
+	return x >= 0 && x < (int64_t) matrix->width && y >= 0 && y < (int64_t) matrix->height;
+}
+
 void matrix_print(Matrix* m)
 {
     for (size_t i = 0; i < m->height; ++i) {
         for (size_t j = 0; j < m->width; ++j) {
-            printf("%d", m->data[i][j]);
+            printf("%ld", m->data[i][j]);
         }
         printf("\n");
     }
