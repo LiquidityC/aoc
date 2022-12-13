@@ -21,6 +21,8 @@ static void capcity_test(void)
     printf("Capacity: %zu\n", ht->capacity);
     assert(ht->length == 10);
     assert(ht->capacity == 32);
+
+    ht_destroy(ht);
 }
 
 static void get_test(void)
@@ -31,6 +33,8 @@ static void get_test(void)
     assert(strcmp("fortytwo", key) == 0);
     int *result = ht_get(ht, "fortytwo");
     assert(42 == *result);
+
+    ht_destroy(ht);
 }
 
 int main()

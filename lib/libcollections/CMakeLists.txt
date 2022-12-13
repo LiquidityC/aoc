@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 3.6.0)
 project(libcollections C)
 enable_testing()
 
+add_compile_options(
+	-ggdb
+	-fsanitize=address
+	-fsanitize=undefined
+	-fno-omit-frame-pointer
+	-Wall
+	-Wextra
+	-pedantic
+	)
+add_link_options(
+	-fsanitize=address
+	-fsanitize=undefined
+	)
+
+
 add_library(libcollections
 	src/linkedlist.c
 	src/matrix.c

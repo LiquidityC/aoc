@@ -19,7 +19,7 @@ static void heapify(Array *a, int i)
 			largest = l;
 		if (r < size && a->array[r] > a->array[largest])
 			largest = r;
-		if (largest != i)
+		if ((int) largest != i)
 		{
 			swap(&a->array[i], &a->array[largest]);
 			heapify(a, largest);

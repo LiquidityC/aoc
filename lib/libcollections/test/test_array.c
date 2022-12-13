@@ -11,6 +11,8 @@ static void test_init(void)
 	for (size_t i = 0; i < a.size; ++i) {
 		assert(a.array[i] == 0);
 	}
+
+	array_free(&a);
 }
 
 static void test_add(void)
@@ -27,6 +29,8 @@ static void test_add(void)
 	assert(a.size == 4);
 	assert(a.used == 2);
 	assert(a.array[1] == 1);
+
+	array_free(&a);
 }
 
 static void test_del(void)
@@ -50,6 +54,8 @@ static void test_del(void)
 	assert(a.array[2] == 3);
 	assert(a.used == 3);
 	assert(a.size == 5);
+
+	array_free(&a);
 }
 
 static void test_insert(void)
@@ -75,6 +81,8 @@ static void test_insert(void)
 	assert(a.array[4] == 3);
 	assert(a.used == 5);
 	assert(a.size == 10);
+
+	array_free(&a);
 }
 
 int main(void)

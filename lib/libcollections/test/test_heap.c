@@ -15,6 +15,8 @@ static void test_init(void)
 
 	heap_init(&a);
 	assert(a.array[0] == 9);
+
+	array_free(&a);
 }
 
 static void test_insert(void)
@@ -29,6 +31,8 @@ static void test_insert(void)
 	heap_insert(&a, 9);
 	heap_insert(&a, 2);
 	assert(a.array[0] == 9);
+
+	array_free(&a);
 }
 
 static void test_delete(void)
@@ -47,6 +51,8 @@ static void test_delete(void)
 	assert(a.array[0] == 7);
 	heap_delete(&a, 7);
 	assert(a.array[0] == 5);
+
+	array_free(&a);
 }
 
 static void test_big_insert(void)
@@ -60,6 +66,8 @@ static void test_big_insert(void)
 	assert(a.array[0] == 99);
 	heap_delete(&a, 99);
 	assert(a.array[0] == 98);
+
+	array_free(&a);
 }
 
 int main(void)
