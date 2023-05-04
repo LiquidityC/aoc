@@ -13,7 +13,7 @@ FileStats* file_stats(FILE *fp)
     stats->lines = 0;
     stats->longest_line = 0;
 
-    int line_len = 0;
+    size_t line_len = 0;
     int ch = 0;
 
     while ((ch = fgetc(fp)) != EOF) {

@@ -2,17 +2,18 @@
 #define __LIBINPUT__
 
 #include <stdio.h>
+#include <stdint.h>
 
 typedef struct FileStats {
-    int lines;
-    int longest_line;
+    size_t lines;
+    size_t longest_line;
 } FileStats;
 
 /** Struct containing the lines of a file */
 typedef struct Lines {
     char **lines;	/**< The lines */
-    int size;		/**< The number of lines */
-    int length;		/**< The lenght of the longest line */
+    size_t size;		/**< The number of lines */
+    size_t length;		/**< The lenght of the longest line */
 } Lines;
 
 /** Read lines from a file handle */
