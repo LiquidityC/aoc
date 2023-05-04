@@ -25,14 +25,18 @@ Lines* lines_read(FILE *fp)
 
     while ((ch = fgetc(fp)) != EOF) {
         if (ch == '\n') {
-            lines->lines[line_num][ch_num] = '\0';
-            line_num += 1;
+            lines->lines[line_num++][ch_num] = '\0';
             ch_num = 0;
         } else {
-            lines->lines[line_num][ch_num] = ch;
-            ch_num += 1;
+            lines->lines[line_num][ch_num++] = ch;
         }
     }
+
+    /* Add the last line. If file didn't end on a new-line */
+    if (ch_num > 0) {
+        lines->lines[line_num][ch_num] = ch;
+    }
+
     rewind(fp);
     return lines;
 }
@@ -46,7 +50,7 @@ void lines_print(Lines *lines)
 
 void lines_free(Lines *lines)
 {
-    for (int i = 0; i < lines->size; i++) {
+    for (size_t i = 0; i < lines->size; i++) {
         free(lines->lines[i]);
     }
     free(lines->lines);

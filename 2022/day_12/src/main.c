@@ -152,8 +152,8 @@ int main(void)
 
 	Matrix *matrix = matrix_new(lines->length, lines->size);
 	Pos start, end;
-	for (int i = 0; i < lines->size; ++i) {
-		for (int j = 0; j < lines->length; ++j) {
+	for (size_t i = 0; i < lines->size; ++i) {
+		for (size_t j = 0; j < lines->length; ++j) {
 			if (lines->lines[i][j] == 'S') {
 				start.x = j;
 				start.y = i;

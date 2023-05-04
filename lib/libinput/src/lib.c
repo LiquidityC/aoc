@@ -7,6 +7,14 @@ static FileStats* stats_new()
     return (FileStats*) malloc(sizeof(FileStats));
 }
 
+static void count_line(FileStats *stats, size_t line_len)
+{
+    stats->lines++;
+    if (line_len > stats->longest_line) {
+        stats->longest_line = line_len;
+    }
+}
+
 FileStats* file_stats(FILE *fp)
 {
     FileStats *stats = stats_new();
@@ -18,14 +26,16 @@ FileStats* file_stats(FILE *fp)
 
     while ((ch = fgetc(fp)) != EOF) {
         if (ch == '\n') {
-            stats->lines++;
-            if (line_len > stats->longest_line) {
-                stats->longest_line = line_len;
-            }
+            count_line(stats, line_len);
             line_len = 0;
         } else {
             line_len += 1;
         }
+    }
+
+    /* If the file didn't end with a new-line then count the last line */
+    if (line_len > 0) {
+        count_line(stats, line_len);
     }
     rewind(fp);
     return stats;
