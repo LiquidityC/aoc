@@ -17,7 +17,7 @@ def map_cave(lines: list[str]):
                 for y in range(min(dy, oy), max(dy, oy)+1):
                     cave[(ox,y)] = True
             ox, oy = dx, dy
-        
+
     return cave
 
 def trickle_sand_without_floor(cave, ox, oy):
