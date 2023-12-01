@@ -34,7 +34,7 @@ Lines* lines_read(FILE *fp)
 
     /* Add the last line. If file didn't end on a new-line */
     if (ch_num > 0) {
-        lines->lines[line_num][ch_num] = ch;
+        lines->lines[line_num][ch_num] = '\0';
     }
 
     rewind(fp);
