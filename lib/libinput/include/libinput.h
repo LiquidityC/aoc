@@ -16,6 +16,9 @@ typedef struct Lines {
     size_t length;		/**< The lenght of the longest line */
 } Lines;
 
+/** Read lines from file path */
+Lines* lines_read_file(const char *fpath);
+
 /** Read lines from a file handle */
 Lines* lines_read(FILE *fp);
 

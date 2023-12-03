@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include "libinput.h"
 
 static Lines* lines_new(int line_count, int line_length)
@@ -10,6 +13,18 @@ static Lines* lines_new(int line_count, int line_length)
     for (int i = 0; i < line_count; ++i) {
         lines->lines[i] = malloc(sizeof(char) * line_length+1);
     }
+    return lines;
+}
+
+Lines* lines_read_file(const char *fpath)
+{
+    FILE *fp = fopen(fpath, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "[!!] Failed to open file %s: %s\n", fpath, strerror(errno));
+        return NULL;
+    }
+    Lines *lines = lines_read(fp);
+    fclose(fp);
     return lines;
 }
 
