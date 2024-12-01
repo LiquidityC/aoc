@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "libcollections.h"
 #include "util.h"
 
@@ -51,6 +52,14 @@ void array_print(Array *a)
 		printf("%ld ", a->array[i]);
 	}
 	printf("\n");
+}
+
+void array_copy(Array *dest, const Array *src)
+{
+    dest->array = ec_realloc(dest->array, src->size * sizeof(int64_t));
+    dest->size = src->size;
+    dest->used = src->used;
+    memcpy(dest->array, src->array, src->used * sizeof(int64_t));
 }
 
 void array_free(Array *a)

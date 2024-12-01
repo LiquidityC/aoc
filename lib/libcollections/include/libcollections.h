@@ -69,6 +69,7 @@ void array_add(Array *a, int64_t v);
 void array_del(Array *a, size_t index);
 void array_insert(Array *a, size_t index, int64_t v);
 void array_print(Array *a);
+void array_copy(Array *dest, const Array *src);
 void array_free(Array *a);
 
 void heap_init(Array *a);
