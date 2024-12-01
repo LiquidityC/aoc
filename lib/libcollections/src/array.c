@@ -54,12 +54,17 @@ void array_print(Array *a)
 	printf("\n");
 }
 
-void array_copy(Array *dest, const Array *src)
+void array_copy(Array *dst, const Array *src)
 {
-    dest->array = ec_realloc(dest->array, src->size * sizeof(int64_t));
-    dest->size = src->size;
-    dest->used = src->used;
-    memcpy(dest->array, src->array, src->used * sizeof(int64_t));
+    dst->array = ec_realloc(dst->array, src->size * sizeof(int64_t));
+    dst->size = src->size;
+    dst->used = src->used;
+    memcpy(dst->array, src->array, src->used * sizeof(int64_t));
+}
+
+void array_sort(Array *a, int (*cmp)(const void *, const void *))
+{
+    qsort(a->array, a->used, sizeof(int64_t), cmp);
 }
 
 void array_free(Array *a)

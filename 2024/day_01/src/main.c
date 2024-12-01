@@ -15,8 +15,8 @@ static void part1(const Array *a, const Array *b)
     array_copy(&list1, a);
     array_copy(&list2, b);
 
-    qsort(list1.array, list1.used, sizeof(int64_t), cmpnum);
-    qsort(list2.array, list2.used, sizeof(int64_t), cmpnum);
+    array_sort(&list1, cmpnum);
+    array_sort(&list2, cmpnum);
 
     uint64_t total_distance = 0;
     for (size_t i = 0; i < list1.used; i++) {
