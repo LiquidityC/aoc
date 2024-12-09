@@ -91,7 +91,7 @@ static void part1(const char *line, size_t len)
 }
 
 struct mem_block {
-    int64_t *block;
+    int64_t block[9];
     size_t size;
     size_t used;
 };
@@ -109,8 +109,8 @@ static struct mem_block* parse_to_mem_blocks(const char *line, size_t len)
         struct mem_block *block = &mem[i];
         uint8_t count = line[i] - '0';
 
+        assert(count < 10);
         block->size = count;
-        block->block = malloc(count * sizeof(int64_t));
         if (is_file) {
             for (size_t j = 0; j < count; j++) {
                 block->block[j] = fcount;
@@ -143,22 +143,15 @@ static uint64_t mem_block_checksum(struct mem_block *mem, size_t len)
     return sum;
 }
 
-static inline void mem_block_free(struct mem_block *mem, size_t len)
-{
-    for (size_t i = 0; i < len; i++) {
-        free(mem[i].block);
-    }
-    free(mem);
-}
-
 static void part2(const char *lines, size_t len)
 {
     struct mem_block *mem;
-    struct mem_block *first, *last;
+    struct mem_block *first, *last, *first_with_space;
 
     mem = parse_to_mem_blocks(lines, len);
 
     first = mem;
+    first_with_space = first;
     last = mem + len - 1;
 
     while (first < last) {
@@ -167,6 +160,13 @@ static void part2(const char *lines, size_t len)
             last--;
         }
 
+        /* Keep track of the first block that is not full to optimize this loop slightly */
+        while (first_with_space < last && first_with_space->used == first_with_space->size) {
+            first_with_space++;
+        }
+
+        first = first_with_space;
+
         /* Find first block with remaining space that can fit the last block */
         while (first < last && (first->size - first->used) < last->used) {
             first++;
@@ -174,7 +174,7 @@ static void part2(const char *lines, size_t len)
 
         /* No move to make. Skip last, reset first and continue */
         if (first >= last) {
-            first = mem;
+            first = first_with_space;
             last--;
             continue;
         }
@@ -187,11 +187,11 @@ static void part2(const char *lines, size_t len)
         last->used = 0;
 
         /* Reset first pointer */
-        first = mem;
+        first = first_with_space;
     }
 
     printf("Part 2: %lu\n", mem_block_checksum(mem, len));
-    mem_block_free(mem, len);
+    free(mem);
 }
 
 int main(int argc, char **argv)
