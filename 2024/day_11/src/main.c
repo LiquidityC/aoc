@@ -18,8 +18,6 @@ typedef struct ht_entry {
 
 typedef struct hash_table {
     Entry *entries[HT_CAPACITY];
-    size_t capacity;
-    size_t length;
 } HashTable;
 
 static HashTable ht;
