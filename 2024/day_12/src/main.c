@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 typedef struct plot {
     char plant;
@@ -44,7 +43,7 @@ static bool check_fence(Garden *garden, size_t dx, size_t dy, char plant)
     return false;
 }
 
-static void garden_plot_region(Region *region, Garden *garden, int x, int y, char plant)
+static void plot_region(Region *region, Garden *garden, int x, int y, char plant)
 {
     /* Off grid */
     if (x < 0 || x >= garden->w || y < 0 || y >= garden->h) {
@@ -85,18 +84,11 @@ static void garden_plot_region(Region *region, Garden *garden, int x, int y, cha
         region->perimeter++;
     }
 
-    garden_plot_region(region, garden, x - 1, y, plant);
-    garden_plot_region(region, garden, x + 1, y, plant);
-    garden_plot_region(region, garden, x, y - 1, plant);
-    garden_plot_region(region, garden, x, y + 1, plant);
+    plot_region(region, garden, x - 1, y, plant);
+    plot_region(region, garden, x + 1, y, plant);
+    plot_region(region, garden, x, y - 1, plant);
+    plot_region(region, garden, x, y + 1, plant);
 }
-
-typedef enum Dir {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-} Dir;
 
 static uint32_t count_region_corners(Garden *garden, uint32_t plot_id)
 {
@@ -156,7 +148,7 @@ static uint32_t count_region_corners(Garden *garden, uint32_t plot_id)
     return corners;
 }
 
-static void part1(Garden *garden)
+static void solve(Garden *garden)
 {
     uint32_t total_cost = 0;
     uint32_t bulk_cost = 0;
@@ -167,7 +159,7 @@ static void part1(Garden *garden)
                 continue;
             }
             Region region = {0, 0};
-            garden_plot_region(&region, garden, j, i, plot->plant);
+            plot_region(&region, garden, j, i, plot->plant);
             total_cost += region.area * region.perimeter;
             bulk_cost += count_region_corners(garden, garden_plot_id) * region.area;
             garden_plot_id++;
@@ -195,7 +187,7 @@ int main(int argc, char **argv)
     garden.h = lines->size;
     lines_free(lines);
 
-    part1(&garden);
+    solve(&garden);
 
     /* Free memory */
     for (int i = 0; i < garden.h; i++) {
