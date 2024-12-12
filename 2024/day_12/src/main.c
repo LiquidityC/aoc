@@ -27,7 +27,7 @@ typedef struct region {
     size_t perimeter;
 } Region;
 
-static uint32_t garden_plot_id = 1;
+static uint32_t g_garden_plot_id = 1;
 
 static bool check_fence(Garden *garden, size_t dx, size_t dy, char plant)
 {
@@ -64,7 +64,7 @@ static void plot_region(Region *region, Garden *garden, int x, int y, char plant
     }
 
     /* Mark as visited */
-    plot->plot_id = garden_plot_id;
+    plot->plot_id = g_garden_plot_id;
     region->area++;
 
     if (check_fence(garden, x - 1, y, plant)) {
@@ -161,8 +161,8 @@ static void solve(Garden *garden)
             Region region = {0, 0};
             plot_region(&region, garden, j, i, plot->plant);
             total_cost += region.area * region.perimeter;
-            bulk_cost += count_region_corners(garden, garden_plot_id) * region.area;
-            garden_plot_id++;
+            bulk_cost += count_region_corners(garden, g_garden_plot_id) * region.area;
+            g_garden_plot_id++;
         }
     }
     printf("Part 1: %u\n", total_cost);
@@ -173,13 +173,16 @@ int main(int argc, char **argv)
 {
     Lines *lines;
     Garden garden;
+    Plot *rows;
 
     lines = lines_read_file("input.txt");
 
-    garden.plots = malloc(sizeof(Plot *) * lines->size);
+    garden.plots = malloc(sizeof(Plot*) * lines->size);
+    rows = calloc(lines->length * lines->size, sizeof(Plot));
+
     for (int i = 0; i < lines->size; i++) {
-        garden.plots[i] = calloc(lines->length, sizeof(Plot));
-        for (int j = 0; j < lines->length; j++) {
+        garden.plots[i] = &rows[i * lines->length];
+        for (size_t j = 0; j < lines->length; j++) {
             garden.plots[i][j].plant = lines->lines[i][j];
         }
     }
@@ -190,9 +193,7 @@ int main(int argc, char **argv)
     solve(&garden);
 
     /* Free memory */
-    for (int i = 0; i < garden.h; i++) {
-        free(garden.plots[i]);
-    }
+    free(rows);
     free(garden.plots);
 
     return 0;
