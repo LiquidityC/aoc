@@ -12,12 +12,13 @@ typedef struct vec2 {
     int y;
 } Vec2;
 
-typedef struct cell {
-    bool wall;
-    bool box;
-    bool robot;
-    bool lhs;
-    bool rhs;
+typedef enum cell_type {
+    EMPTY,
+    WALL,
+    BOX,
+    LBOX,
+    RBOX,
+    ROBOT
 } Cell;
 
 typedef struct grid {
@@ -59,34 +60,38 @@ static void parse_grid_from_lines(Grid *grid, Lines *lines, Vec2 *rpos, bool wid
             switch (lines->lines[i][j]) {
                 case '#':
                     if (!wide) {
-                        grid->cells[i][j].wall = true;
+                        grid->cells[i][j] = WALL;
                     } else {
-                        grid->cells[i][j * 2].wall = true;
-                        grid->cells[i][j * 2 + 1].wall = true;
+                        grid->cells[i][j * 2] = WALL;
+                        grid->cells[i][j * 2 + 1] = WALL;
                     }
                     break;
                 case 'O':
                     if (!wide) {
-                        grid->cells[i][j].box = true;
+                        grid->cells[i][j] = BOX;
                     } else {
-                        grid->cells[i][j * 2].box = true;
-                        grid->cells[i][j * 2].lhs = true;
-                        grid->cells[i][j * 2 + 1].box = true;
-                        grid->cells[i][j * 2 + 1].rhs = true;
+                        grid->cells[i][j * 2] = LBOX;
+                        grid->cells[i][j * 2 + 1] = RBOX;
                     }
                     break;
                 case '@':
                     if (!wide) {
                         rpos->x = j;
                         rpos->y = i;
-                        grid->cells[i][j].robot = true;
+                        grid->cells[i][j] = ROBOT;
                     } else {
                         rpos->x = j * 2;
                         rpos->y = i;
-                        grid->cells[i][j * 2].robot = true;
+                        grid->cells[i][j * 2] = ROBOT;
                     }
                     break;
                 case '.':
+                    if (!wide) {
+                        grid->cells[i][j] = EMPTY;
+                    } else {
+                        grid->cells[i][j * 2] = EMPTY;
+                        grid->cells[i][j * 2 + 1] = EMPTY;
+                    }
                     break;
                 default:
                     fprintf(stderr, "Invalid character in input file: %c\n", lines->lines[i][j]);
@@ -141,7 +146,6 @@ static Grid* parse_grid(Lines *lines, Vec2 *rpos, bool wide)
     assert(grid->cell_data != NULL);
     memset(grid->cell_data, 0, grid->h * grid->w * sizeof(Cell));
 
-    /* Parse */
     for (size_t i = 0; i < grid->h; i++) {
         grid->cells[i] = grid->cell_data + i * grid->w;
     }
@@ -157,9 +161,7 @@ static uint32_t calculate_gps(Grid *grid, bool wide)
     uint32_t score = 0;
     for (size_t i = 0; i < grid->h; i++) {
         for (size_t j = 0; j < grid->w; j++) {
-            if (grid->cells[i][j].box && !wide) {
-                score += 100 * i + j;
-            } else if (grid->cells[i][j].lhs) {
+            if (grid->cells[i][j] == BOX || grid->cells[i][j] == LBOX) {
                 score += 100 * i + j;
             }
         }
@@ -169,15 +171,15 @@ static uint32_t calculate_gps(Grid *grid, bool wide)
 
 static bool check_move_box(Grid *grid, Vec2 pos, const Vec2 *move)
 {
-    Cell *cell = &grid->cells[pos.y][pos.x];
-    assert(cell->box);
+    Cell cell = grid->cells[pos.y][pos.x];
+    assert(cell == BOX || cell == LBOX || cell == RBOX);
 
     bool vertical_move = move->y != 0;
-    if (vertical_move && cell->rhs) {
+    if (vertical_move && cell == RBOX) {
         Vec2 np1 = {pos.x - 1, pos.y + move->y};
         Vec2 np2 = {pos.x, pos.y + move->y};
         return check_move(grid, np1, move) && check_move(grid, np2, move);
-    } else if (vertical_move && cell->lhs) {
+    } else if (vertical_move && cell == LBOX) {
         Vec2 np1 = {pos.x, pos.y + move->y};
         Vec2 np2 = {pos.x + 1, pos.y + move->y};
         return check_move(grid, np1, move) && check_move(grid, np2, move);
@@ -192,18 +194,16 @@ static bool check_move_box(Grid *grid, Vec2 pos, const Vec2 *move)
 
 static bool check_move(Grid *grid, Vec2 pos, const Vec2 *move)
 {
-    Cell *cell = &grid->cells[pos.y][pos.x];
-    if (!cell->robot && !cell->box && !cell->wall) {
+    Cell cell = grid->cells[pos.y][pos.x];
+    if (cell == EMPTY) {
         return true;
-    }
-
-    if (cell->wall) {
+    } else if (cell == WALL) {
         return false;
     }
 
-    if (cell->box) {
+    if (cell == BOX || cell == LBOX || cell == RBOX) {
         return check_move_box(grid, pos, move);
-    } else if (cell->robot) {
+    } else if (cell == ROBOT) {
         Vec2 newpos = {pos.x + move->x, pos.y + move->y};
         return check_move(grid, newpos, move);
     }
@@ -213,64 +213,52 @@ static bool check_move(Grid *grid, Vec2 pos, const Vec2 *move)
 
 static inline void execute_move_box(Grid *grid, Vec2 pos, const Vec2 *move)
 {
-    Cell *cell = &grid->cells[pos.y][pos.x];
-    assert(cell->box);
+    Cell cell = grid->cells[pos.y][pos.x];
+    assert(cell == BOX || cell == LBOX || cell == RBOX);
 
     bool vertical_move = move->y != 0;
-    if (vertical_move && cell->rhs) {
+    if (vertical_move && cell == RBOX) {
         Vec2 np1 = {pos.x - 1, pos.y + move->y};
         Vec2 np2 = {pos.x, pos.y + move->y};
         execute_move(grid, np1, move);
         execute_move(grid, np2, move);
 
-        grid->cells[pos.y][pos.x].box = false;
-        grid->cells[pos.y][pos.x].rhs = false;
-        grid->cells[pos.y][pos.x - 1].box = false;
-        grid->cells[pos.y][pos.x - 1].lhs = false;
-        grid->cells[np1.y][np1.x].box = true;
-        grid->cells[np2.y][np2.x].box = true;
-        grid->cells[np1.y][np1.x].lhs = true;
-        grid->cells[np2.y][np2.x].rhs = true;
-    } else if (vertical_move && cell->lhs) {
+        grid->cells[np1.y][np1.x] = LBOX;
+        grid->cells[np2.y][np2.x] = RBOX;
+        grid->cells[pos.y][pos.x] = EMPTY;
+        grid->cells[pos.y][pos.x - 1] = EMPTY;
+    } else if (vertical_move && cell == LBOX) {
         Vec2 np1 = {pos.x, pos.y + move->y};
         Vec2 np2 = {pos.x + 1, pos.y + move->y};
         execute_move(grid, np1, move);
         execute_move(grid, np2, move);
-        grid->cells[pos.y][pos.x].box = false;
-        grid->cells[pos.y][pos.x].lhs = false;
-        grid->cells[pos.y][pos.x + 1].box = false;
-        grid->cells[pos.y][pos.x + 1].rhs = false;
-        grid->cells[np1.y][np1.x].box = true;
-        grid->cells[np2.y][np2.x].box = true;
-        grid->cells[np1.y][np1.x].lhs = true;
-        grid->cells[np2.y][np2.x].rhs = true;
+        grid->cells[np1.y][np1.x] = LBOX;
+        grid->cells[np2.y][np2.x] = RBOX;
+        grid->cells[pos.y][pos.x] = EMPTY;
+        grid->cells[pos.y][pos.x + 1] = EMPTY;
     } else {
-        /* Normal (part 1) box move */
         Vec2 newpos = {pos.x + move->x, pos.y + move->y};
         execute_move(grid, newpos, move);
-        grid->cells[newpos.y][newpos.x].box = true;
-        grid->cells[newpos.y][newpos.x].rhs = cell->rhs;
-        grid->cells[newpos.y][newpos.x].lhs = cell->lhs;
-        cell->box = false;
-        cell->rhs = false;
-        cell->lhs = false;
+        grid->cells[newpos.y][newpos.x] = cell;
+        grid->cells[pos.y][pos.x] = EMPTY;
     }
 }
 
 static void execute_move(Grid *grid, Vec2 pos, const Vec2 *move)
 {
-    Cell *cell = &grid->cells[pos.y][pos.x];
-    if (!cell->robot && !cell->box && !cell->wall) {
+    Cell cell = grid->cells[pos.y][pos.x];
+    assert(cell != WALL);
+    if (cell == EMPTY) {
         return;
     }
 
-    if (cell->box) {
+    if (cell == BOX || cell == LBOX || cell == RBOX) {
         return execute_move_box(grid, pos, move);
-    } else if (cell->robot) {
+    } else if (cell == ROBOT) {
         Vec2 newpos = {pos.x + move->x, pos.y + move->y};
         execute_move(grid, newpos, move);
-        grid->cells[pos.y][pos.x].robot = false;
-        grid->cells[newpos.y][newpos.x].robot = true;
+        grid->cells[pos.y][pos.x] = EMPTY;
+        grid->cells[newpos.y][newpos.x] = ROBOT;
     }
 }
 
@@ -307,16 +295,25 @@ static void print_grid(Grid *grid)
 {
     for (size_t i = 0; i < grid->h; i++) {
         for (size_t j = 0; j < grid->w; j++) {
-            if (grid->cells[i][j].lhs) {
-                printf("[");
-            } else if (grid->cells[i][j].rhs) {
-                printf("]");
-            } else if (grid->cells[i][j].wall) {
-                printf("#");
-            } else if (grid->cells[i][j].robot) {
-                printf("@");
-            } else {
-                printf(".");
+            switch (grid->cells[i][j]) {
+                case EMPTY:
+                    printf(".");
+                    break;
+                case WALL:
+                    printf("#");
+                    break;
+                case BOX:
+                    printf("O");
+                    break;
+                case LBOX:
+                    printf("[");
+                    break;
+                case RBOX:
+                    printf("]");
+                    break;
+                case ROBOT:
+                    printf("@");
+                    break;
             }
         }
         printf("\n");
