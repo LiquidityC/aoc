@@ -103,18 +103,18 @@ void part2()
 	// Parse the character matrix left to right, top to bottom
 	problems.emplace_back();
 	for (int i = line_len - 1; i >= 0; --i) {
-		std::string sum = "";
+		u64 sum = 0;
 		for (auto line : lines) {
 			char c = line[i];
 			if (c != ' ') {
-				sum.push_back(c);
+				sum = sum * 10 + (c - '0');
 			}
 		}
-		if (sum.empty()) {
+		if (sum == 0) { // Column was empty
 			problems.emplace_back();
 			continue;
-		} else {
-			problems.back().push_back(std::stoll(sum));
+		} else { // Column had a number
+			problems.back().push_back(sum);
 		}
 	}
 
